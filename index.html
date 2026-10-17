@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Focal — Spazio Personale</title>
+
+  <!-- Risorsa esterna ammessa: Google Fonts (Poppins & Material Symbols Outlined) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Canvas trasparente per effetto coriandoli -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <!-- Contenitore principale mobile-first -->
+  <div class="app-viewport">
+
+    <!-- ========================================================
+         === 1. HEADER (Brand & Navigazione Rapida) ===
+         ======================================================== -->
+    <header class="app-header">
+      <!-- Icona profilo utente (sinistra) -->
+      <button type="button" class="icon-button" id="profile-btn" aria-label="Profilo personale">
+        <span class="material-symbols-outlined">person</span>
+      </button>
+
+      <!-- Titolo centrale del brand -->
+      <div class="brand-container">
+        <h1 class="brand-title">Focal</h1>
+        <span class="brand-subtitle">SPAZIO PERSONALE</span>
+      </div>
+
+      <!-- Icona impostazioni (destra) -->
+      <button type="button" class="icon-button" id="settings-btn" aria-label="Impostazioni e riepilogo">
+        <span class="material-symbols-outlined">settings</span>
+      </button>
+    </header>
+
+    <main>
+      <!-- ========================================================
+           === 2. DATA, ORA & FRASE DEL GIORNO ===
+           ======================================================== -->
+      <section class="anchor-section" aria-label="Ancoraggio temporale e citazione">
+        <!-- Barra data e orario in tempo reale -->
+        <div class="datetime-bar">
+          <div class="time-date-group">
+            <span class="current-time" id="live-clock">09:41</span>
+            <span class="dot-separator">•</span>
+            <span class="current-date" id="live-date">Mercoledì, 24 Ottobre</span>
+          </div>
+          <!-- Pulsante icona calendario -->
+          <button type="button" class="calendar-button" id="calendar-btn" aria-label="Apri calendario storico">
+            <span class="material-symbols-outlined">calendar_today</span>
+          </button>
+        </div>
+
+        <!-- Scheda con frase del giorno -->
+        <div class="quote-box">
+          <span class="quote-header">Frase del giorno</span>
+          <p class="quote-body" id="quote-text">
+            «Respira. Non devi risolvere tutta la tua vita in questo istante. Concentrati solo su questo respiro, qui e ora.»
+          </p>
+        </div>
+      </section>
+
+      <!-- ========================================================
+           === 3. CHECK-IN EMOTIVO & MICRO-JOURNALING ===
+           ======================================================== -->
+      <section class="card mood-card" aria-label="Check-in emotivo">
+        <div class="mood-top-row">
+          <h2 class="mood-title">Come ti senti?</h2>
+          <!-- Selettore dei tre stati d'animo -->
+          <div class="mood-pills-group" id="mood-selector">
+            <button type="button" class="mood-pill active" data-mood="felice" aria-label="Umore felice">
+              <span class="material-symbols-outlined">sentiment_satisfied</span>
+            </button>
+            <button type="button" class="mood-pill" data-mood="neutro" aria-label="Umore neutro">
+              <span class="material-symbols-outlined">sentiment_neutral</span>
+            </button>
+            <button type="button" class="mood-pill" data-mood="triste" aria-label="Umore triste">
+              <span class="material-symbols-outlined">sentiment_dissatisfied</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Casella di testo per il pensiero -->
+        <div class="note-input-container">
+          <label for="emotion-note" class="sr-only" style="display:none;">Scrivi cosa provi</label>
+          <textarea id="emotion-note" class="note-textarea" rows="3" placeholder="Cosa provi dentro di te in questo momento? Lascia fluire i pensieri senza giudicarli..."></textarea>
+          <!-- Pulsante freccia per registrare l'umore -->
+          <button type="button" class="submit-arrow-button" id="save-note-btn" aria-label="Registra pensiero">
+            <span class="material-symbols-outlined">arrow_upward</span>
+          </button>
+        </div>
+        <div class="feedback-toast" id="mood-feedback">Pensiero custodito con cura.</div>
+      </section>
+
+      <!-- ========================================================
+           === 4. OBIETTIVI DELLA GIORNATA ===
+           ======================================================== -->
+      <section aria-label="Obiettivi della giornata">
+        <div class="section-header">
+          <h2 class="section-title">Obiettivi della giornata</h2>
+          <button type="button" class="add-button" id="add-goal-btn" aria-label="Aggiungi obiettivo">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
+
+        <!-- Lista dinamica degli obiettivi -->
+        <div class="card goals-list" id="goals-container">
+          <!-- Renderizzato dinamicamente via JS -->
+        </div>
+      </section>
+
+      <!-- ========================================================
+           === 5. APPUNTAMENTI DELLA GIORNATA ===
+           ======================================================== -->
+      <section aria-label="Appuntamenti della giornata">
+        <div class="section-header">
+          <h2 class="section-title">Appuntamenti della giornata</h2>
+          <button type="button" class="add-button" id="add-appointment-btn" aria-label="Aggiungi appuntamento">
+            <span class="material-symbols-outlined">add</span>
+          </button>
+        </div>
+
+        <!-- Timeline degli impegni -->
+        <div class="card timeline-card">
+          <div class="timeline-wrapper" id="timeline-container">
+            <!-- Linea verticale continua -->
+            <div class="timeline-line"></div>
+            <!-- Gli elementi della timeline verranno inseriti dinamicamente via JS -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ========================================================
+         === 6. MODALI E POP-UP (INTERAZIONI) ===
+         ======================================================== -->
+
+    <!-- Modal 1: Nuovo Obiettivo -->
+    <div class="modal-overlay" id="goal-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Nuovo Obiettivo</h3>
+          <button type="button" class="modal-close-btn" data-close="goal-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label" for="goal-input-text">Descrizione dell'obiettivo gentile</label>
+          <input type="text" id="goal-input-text" class="modal-input" placeholder="Es. Bere un bicchiere d'acqua fresca..." maxlength="80">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="goal-modal">Annulla</button>
+          <button type="button" class="btn-primary" id="save-goal-modal-btn">Salva</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 2: Nuovo Appuntamento -->
+    <div class="modal-overlay" id="appointment-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Nuovo Appuntamento</h3>
+          <button type="button" class="modal-close-btn" data-close="appointment-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label" for="appt-title-input">Titolo appuntamento</label>
+          <input type="text" id="appt-title-input" class="modal-input" placeholder="Es. Passeggiata al parco" maxlength="60">
+        </div>
+        <div class="modal-form-group">
+          <label class="modal-label" for="appt-note-input">Dettagli / Luogo</label>
+          <input type="text" id="appt-note-input" class="modal-input" placeholder="Es. Senza fretta • telefono spento" maxlength="80">
+        </div>
+        <!-- Selezione combinata Data e Orario -->
+        <div style="display: flex; gap: 10px;">
+          <div class="modal-form-group" style="flex: 1.2;">
+            <label class="modal-label" for="appt-date-input">Data appuntamento</label>
+            <input type="date" id="appt-date-input" class="modal-input">
+          </div>
+          <div class="modal-form-group" style="flex: 0.8;">
+            <label class="modal-label" for="appt-time-input">Orario</label>
+            <input type="time" id="appt-time-input" class="modal-input" value="14:00">
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="appointment-modal">Annulla</button>
+          <button type="button" class="btn-primary" id="save-appt-modal-btn">Salva</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 3: Cosa Positiva (Ore 10, 16, 21) -->
+    <div class="modal-overlay" id="positive-thing-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline" id="positive-modal-title">Momento di Gratitudine</h3>
+          <button type="button" class="modal-close-btn" data-close="positive-thing-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <p style="font-size: 13px; color: var(--color-text-subtle); margin-bottom: 12px; line-height: 1.4;" id="positive-modal-desc">
+          Fermati un momento. Scrivi 1 cosa positiva accaduta fino ad ora, anche piccola:
+        </p>
+        <div class="modal-form-group">
+          <input type="text" id="positive-thing-input" class="modal-input" placeholder="Es. Il calore del sole sul viso, un sorriso..." maxlength="120">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="positive-thing-modal">Più tardi</button>
+          <button type="button" class="btn-primary" id="save-positive-btn">Salva pensiero positivo</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 4: Profilo Utente -->
+    <div class="modal-overlay" id="profile-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Spazio Personale</h3>
+          <button type="button" class="modal-close-btn" data-close="profile-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div class="profile-card-content">
+          <div class="profile-avatar-circle">
+            <span class="material-symbols-outlined">person</span>
+          </div>
+          <div class="profile-name">Laura Rossi</div>
+          <div class="profile-meta">laura.rossi@email.it • Con noi dal 2024</div>
+          <p style="font-size: 12.5px; font-style: italic; color: var(--color-text-subtle); margin: 4px 0;">
+            «Un respiro alla volta, senza giudizio, qui e ora.»
+          </p>
+
+          <div class="profile-stats-grid">
+            <div class="profile-stat-box">
+              <div class="profile-stat-val" id="stat-completed-goals">1/4</div>
+              <div class="profile-stat-lbl">Obiettivi svolti</div>
+            </div>
+            <div class="profile-stat-box">
+              <div class="profile-stat-val" id="stat-mood-count">1</div>
+              <div class="profile-stat-lbl">Check-in emotivi</div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" data-close="profile-modal">Chiudi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 5: Impostazioni & Riepilogo Serale -->
+    <div class="modal-overlay" id="settings-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Impostazioni &amp; Strumenti</h3>
+          <button type="button" class="modal-close-btn" data-close="settings-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+          <!-- Voce richiesta esplicitamente: Mostra riepilogo attuale -->
+          <button type="button" class="btn-primary" id="open-report-from-settings-btn" style="text-align: left; display: flex; align-items: center; justify-content: space-between;">
+            <span>Mostra riepilogo della giornata</span>
+            <span class="material-symbols-outlined">description</span>
+          </button>
+
+          <!-- Tasti didattici per simulare i pop-up delle 10/16/21 e il report delle 22 -->
+          <button type="button" class="btn-secondary" id="simulate-positive-btn" style="text-align: left; display: flex; align-items: center; justify-content: space-between;">
+            <span>Simula notifica: 1 cosa positiva</span>
+            <span class="material-symbols-outlined">notifications_active</span>
+          </button>
+          <button type="button" class="btn-secondary" id="simulate-evening-report-btn" style="text-align: left; display: flex; align-items: center; justify-content: space-between;">
+            <span>Simula orario 22:00 (Genera Report)</span>
+            <span class="material-symbols-outlined">auto_graph</span>
+          </button>
+          <button type="button" class="btn-secondary" id="reset-sample-data-btn" style="text-align: left; display: flex; align-items: center; justify-content: space-between; color: #ba1a1a;">
+            <span>Ripristina dati iniziali di prova</span>
+            <span class="material-symbols-outlined">refresh</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 6: Calendario Storico -->
+    <div class="modal-overlay" id="calendar-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Calendario &amp; Storico</h3>
+          <button type="button" class="modal-close-btn" data-close="calendar-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <p style="font-size: 12.5px; color: var(--color-text-subtle);">
+          Tocca una data precedente contrassegnata in verde per consultare il diario e il riepilogo di quel giorno.
+        </p>
+
+        <!-- Griglia mensile interattiva -->
+        <div class="calendar-grid" id="calendar-days-grid">
+          <!-- Popolato dinamicamente da JS -->
+        </div>
+
+        <div id="calendar-day-summary" style="margin-top: 14px; font-size: 13px; color: var(--color-text-main);">
+          <!-- Resoconto del giorno selezionato -->
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" data-close="calendar-modal">Chiudi</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 7: Report Completo della Giornata (Generato alle 22:00 o su richiesta) -->
+    <div class="modal-overlay" id="report-modal">
+      <div class="modal-card">
+        <div class="modal-handle-bar"></div>
+        <div class="modal-header-row">
+          <h3 class="modal-headline">Riepilogo della Giornata</h3>
+          <button type="button" class="modal-close-btn" data-close="report-modal">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        <p style="font-size: 12px; color: var(--color-text-muted); margin-bottom: 14px;">
+          Tutti i tuoi passi, pensieri e impegni ordinati cronologicamente:
+        </p>
+
+        <!-- Contenitore del report dinamico -->
+        <div id="daily-report-content">
+          <!-- Verrà popolato da JS con ordini cronologici -->
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-primary" data-close="report-modal">Ho finito per oggi</button>
+        </div>
+      </div>
+    </div>
+
+  </div> <!-- fine .app-viewport -->
+
+  <script src="script.js"></script>
+</body>
+</html>
